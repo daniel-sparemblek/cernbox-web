@@ -1,0 +1,80 @@
+
+version: '3.8'
+services:
+  reva:
+    container_name: reva
+    build:
+      context: ./reva
+      dockerfile: ./docker/Dockerfile.revad-local
+    ports:
+      - 20000:20000
+      - 20001:20001
+    volumes:
+      - ./reva:/home/reva
+      - ./reva/examples/local:/etc/revad
+
+  reva-extra:
+    container_name: reva-extra
+    build:
+      context: ./reva
+      dockerfile: ./docker/Dockerfile.revad-local-extra
+    ports:
+      - 21000:21000
+      - 21001:21001
+    volumes:
+      - ./reva/examples/local:/etc/revad
+      - ./storage/:/var/tmp/reva
+
+  web:
+    container_name: web
+    build:
+      context: ./web
+      dockerfile: ./docker/Dockerfile.local
+    ports:
+      - 9100:80
+    volumes:
+      - ./web:/home/web
+
+  idp:
+    container_name: idp
+    image: quay.io/keycloak/keycloak:21.1.1
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=idp
+    ports:
+      - 8080:8080
+    volumes:
+      - ./idp:/opt/keycloak/data/import
+    command:
+      - start-dev
+      - --import-realm
+
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx:/etc/nginx
+      - ./web-extensions:/var/www/cernbox
+
+  mysql:
+    container_name: mysql
+    image: mysql:5-debian
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_DATABASE=cernboxngcopy
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/initial:/docker-entrypoint-initdb.d
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 26677
+        hard: 46677

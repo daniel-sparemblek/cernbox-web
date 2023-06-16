@@ -1,0 +1,11 @@
+[submodule "reva"]
+	path = reva
+	url = https://github.com/javfg/reva.git
+	branch = notifications-gsocdev
+[submodule "web"]
+	path = web
+	url = https://github.com/javfg/cernbox-web.git
+	branch = notifications-gsocdev
+[submodule "web-extensions"]
+	path = web-extensions
+	url = https://github.com/cernbox/web-extensions.git
