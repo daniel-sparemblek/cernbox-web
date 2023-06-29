@@ -78,3 +78,12 @@ services:
       nofile:
         soft: 26677
         hard: 46677
+
+  nats:
+    container_name: nats
+    image: nats
+    ports:
+      - 4222:4222
+      - 8222:8222
+    volumes:
+      - ./nats/nats-server.conf:/nats-server.conf
